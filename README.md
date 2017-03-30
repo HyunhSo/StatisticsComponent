@@ -6,8 +6,7 @@ functions defined in StatBarWidget has been implemented in BP_StatBar(blueprint)
 No changes have been made in ThirdPersonCharacter, BaseCharacter or GameMode classes.
 
 In Build file new modules have been added to be able to use UUserWidget class
-
-  PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "UMG" });
-  
-  PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+ 
+PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "UMG" });
+PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
   
