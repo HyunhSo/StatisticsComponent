@@ -1,6 +1,9 @@
 # StatisticsComponent
 how to setup -> https://www.youtube.com/watch?v=itIDrofWQik
 
+When turning on, missing modules message should pop out, press yes and wait till edit opens.
+To generate visual studio files, click RMB on uproject file->Generate visual studio project files.
+
 Only 2 classes are important here, StatisticsComponent and StatBarWidget,
 functions defined in StatBarWidget has been implemented in BP_StatBar(blueprint), which are simple 1 node returns.
 No changes have been made in ThirdPersonCharacter, BaseCharacter or GameMode classes.
