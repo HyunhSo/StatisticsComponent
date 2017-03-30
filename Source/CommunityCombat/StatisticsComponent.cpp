@@ -13,8 +13,7 @@
 // Sets default values for this component's properties
 UStatisticsComponent::UStatisticsComponent()
 {
-	ReeneableRegenTime = 0.2f;
-	RegenerationTickInterval = 0.05f;
+	//
 }
 
 
@@ -241,7 +240,7 @@ void UStatisticsComponent::SetupStatsRegeneration()
 			FTimerDelegate timerDel(FTimerDelegate::CreateUObject<UStatisticsComponent, EStat, float&>
 				(this, &UStatisticsComponent::Regeneration, itr.Key, itr.Value.RegenValue));
 
-			GetWorld()->GetTimerManager().SetTimer(itr.Value.RegenerationTimerHandle, timerDel, UStatisticsComponent::RegenerationTickInterval, true);
+			GetWorld()->GetTimerManager().SetTimer(itr.Value.RegenerationTimerHandle, timerDel, itr.Value.RegenTickInterval, true);
 
 		}
 	}
@@ -260,7 +259,7 @@ void UStatisticsComponent::RefreshRegenerationTimer(EStat stat)
 
 	//set regen timer with first delay of ReeneableRegenTime value
 	GetWorld()->GetTimerManager().SetTimer(statData->RegenerationTimerHandle, timerDel,
-		UStatisticsComponent::RegenerationTickInterval, true, UStatisticsComponent::ReeneableRegenTime);
+		statData->RegenTickInterval, true, statData->ReeneableRegenTime);
 
 }
 

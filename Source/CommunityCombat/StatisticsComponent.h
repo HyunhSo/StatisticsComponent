@@ -30,6 +30,8 @@ struct FStatData
 		MinLerpTime = 0.5f;
 		MaxLerpTime = 1.5f;
 		RegenValue = 1.f;
+		RegenTickInterval = 0.05f;
+		ReeneableRegenTime = 0.2f;
 	}
 
 	FStatData(float minValue, float maxValue) : MinValue(minValue), MaxValue(maxValue), CurrentValue(maxValue), DisplayedValue(maxValue)
@@ -37,7 +39,31 @@ struct FStatData
 		MinLerpTime = 0.5f;
 		MaxLerpTime = 1.5f;
 		RegenValue = 1.f;
+		RegenTickInterval = 0.05f;
+		ReeneableRegenTime = 0.2f;
 	}
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData)
+	bool HasRegeneration;
+
+	/* time after regenenration timer will be set again if it was cleared,
+	to avoid insta regen after losing some stat value, which look weird */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData, meta = (ClampMin = 0, ClampMax = 10, UMin = 0, UIMax = 0))
+	float ReeneableRegenTime;
+
+	//time between regen timer ticks
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData, meta = (ClampMin = 0, ClampMax = 10, UMin = 0, UIMax = 0))
+	float RegenTickInterval;
+
+	/* value added to stat with every timer tick if HasRegeneration is enabled
+	can as well be set to negative value */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData)
+	float RegenValue;
+
+	//current stat value
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData, meta = (ClampMin = 0))
+	float CurrentValue;
 
 	//minimum stat value
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData, meta = (ClampMin = 0))
@@ -46,10 +72,6 @@ struct FStatData
 	//maximum stat value
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData, meta = (ClampMin = 0))
 	float MaxValue;
-
-	//current stat value
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData, meta = (ClampMin = 0))
-	float CurrentValue;
 
 	//value displayed with remove bar
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData, meta = (ClampMin = 0))
@@ -64,31 +86,26 @@ struct FStatData
 	float MaxLerpTime;
 
 	//is remove bar currenly animated
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = StatData)
 	bool IsCurrentlyAnimated;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData)
-	bool HasRegeneration;
+	
+	//floated time increasing with time when remove bar is ticking
+	UPROPERTY(BlueprintReadOnly, Category = StatData)
+	float FloatedTime;
 
 	//pointer to stat widget, must be set with SetWidgetReference function on FOnComponentBeginPlay Event !!
 	UPROPERTY(BlueprintReadWrite, Category = StatData)
 	class UStatBarWidget* BarWidget;
 
-	//value added to stat with every timer tick if HasRegeneration is enabled
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = StatData, meta = (ClampMin = 0))
-	float RegenValue;
-	
-	//floated time increasing with time when remove bar is ticking
-	UPROPERTY()
-	float FloatedTime;
-
 	//handle responsible for regeneration timer
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = StatData)
 	FTimerHandle RegenerationTimerHandle;
 
 	//handle responsible for update ticking
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = StatData)
 	FTimerHandle UpdateRemoveBarHandle;
+
+	
 };
 
 USTRUCT(BlueprintType)
@@ -132,17 +149,6 @@ protected:
 								//STAT BARS
 //////////////////////////////////////////////////////////////////////////////////
 
-protected:
-
-	//time between regen timer ticks
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Stats, meta = (ClampMin = 0, ClampMax = 10, UMin = 0, UIMax = 0))
-	float RegenerationTickInterval;
-
-	/* time after regenenration timer will be set again if it was cleared,
-	to avoid insta regen after losing some stat value, which look weird */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Stats, meta = (ClampMin = 0, ClampMax = 10, UMin = 0, UIMax = 0))
-	float ReeneableRegenTime;
-
 
 private:
 
@@ -173,14 +179,6 @@ private:
 	UFUNCTION()
 	void Regeneration(EStat stat, float& regenValue);
 
-	//function called to clear regeneration timer, used in ModifyStat, if given value has enabled isAnimated
-	UFUNCTION()
-	void ClearRegenerationTimer(EStat stat);
-
-	//function called to reenable regeneration timer after ReeneableRegenTime 
-	UFUNCTION()
-	void RefreshRegenerationTimer(EStat stat);
-
 	//called on begin play or when widgets are recreated to update existing stats and set RemoveBar Material parameters to proper values
 	UFUNCTION()
 	void BeginPlayStatsSetup();
@@ -189,11 +187,18 @@ private:
 	UFUNCTION()
 	void SetupStatsRegeneration();
 
-	/** function used only in c++, to get stat in bp use GetStatData function which is safe to use even if stat is invalid */
-	FStatData* GetStat(EStat stat);
-
 public:
 
+	//function called to clear regeneration timer, used in ModifyStat, if given value has enabled isAnimated
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void ClearRegenerationTimer(EStat stat);
+
+	//function called to reenable regeneration timer after ReeneableRegenTime 
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void RefreshRegenerationTimer(EStat stat);
+
+	/** function used only in c++, to get stat in bp use GetStatData function which is safe to use even if stat is invalid */
+	FStatData* GetStat(EStat stat);
 
 	//container with stat bars
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
