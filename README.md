@@ -1,4 +1,5 @@
 # StatisticsComponent
+Engine Version 4.15.1
 how to setup -> https://www.youtube.com/watch?v=itIDrofWQik
 
 When turning on, missing modules message should pop out, press yes and wait till editor opens.
